@@ -1,7 +1,9 @@
 <p class="payment_module">
     <a class="payabbhi" href="{$link->getModuleLink('payabbhi', 'payment', [], true)}" title="{l s='Pay by Payabbhi' mod='payabbhi'}">
-        {l s='Pay with Card, NetBanking, Wallet' mod='payabbhi'}
-        <span>(via Payabbhi)</span>
+        {l s=$payment_description mod='payabbhi'}
+        {if $payment_description}
+          <span>(via Payabbhi)</span>
+        {/if}
     </a>
 </p>
 

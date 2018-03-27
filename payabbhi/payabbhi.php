@@ -10,46 +10,17 @@ class Payabbhi extends PaymentModule
   {
     $this->name = 'payabbhi';
     $this->tab = 'payments_gateways';
-    $this->version = '1.0.0';
+    $this->version = '1.0.1';
     $this->author = 'Payabbhi Team';
     $this->need_instance = 0;
     $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     $this->bootstrap = true;
-
-    $config = Configuration::getMultiple(array('PAYABBHI_ACCESS_ID', 'PAYABBHI_SECRET_KEY', 'PAYABBHI_PAYMENT_AUTO_CAPTURE'));
-
-    $accessID = $config['PAYABBHI_ACCESS_ID'];
-    $secretKey = $config['PAYABBHI_SECRET_KEY'];
-    $paymentAutoCapture = $config['PAYABBHI_PAYMENT_AUTO_CAPTURE'];
-
-    if (!empty($accessID)) {
-        $this->access_id = $config['PAYABBHI_ACCESS_ID'];
-    }
-
-    if (!empty($secretKey)){
-        $this->secret_key = $config['PAYABBHI_SECRET_KEY'];
-    }
-
-    if (!empty($paymentAutoCapture)) {
-      $this->payment_auto_capture = $config['PAYABBHI_PAYMENT_AUTO_CAPTURE'];
-    } else {
-      $this->payment_auto_capture = 'true';
-    }
 
     parent::__construct();
 
     $this->displayName = $this->l('Payabbhi');
     $this->description = $this->l('Prestashop module for accepting payments with Payabbhi.');
     $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
-
-
-    if (!isset($this->access_id)) {
-      $this->warning = $this->l('Payabbhi Acccess ID not set.');
-    }
-
-    if (!isset($this->secret_key)) {
-      $this->warning = $this->l('Payabbhi Secret Key not set.');
-    }
   }
 
   public function install()
@@ -64,6 +35,7 @@ class Payabbhi extends PaymentModule
 
     if (!Configuration::updateValue('PAYABBHI_ACCESS_ID', '')
         || !Configuration::updateValue('PAYABBHI_SECRET_KEY', '')
+        || !Configuration::updateValue('PAYABBHI_PAYMENT_DESCRIPTION', 'Pay with Card, Netbanking, Wallet')
         || !Configuration::updateValue('PAYABBHI_PAYMENT_AUTO_CAPTURE', '')) {
       return false;
     }
@@ -75,6 +47,7 @@ class Payabbhi extends PaymentModule
   {
     if (!Configuration::deleteByName('PAYABBHI_ACCESS_ID')
         || !Configuration::deleteByName('PAYABBHI_SECRET_KEY')
+        || !Configuration::deleteByName('PAYABBHI_PAYMENT_DESCRIPTION')
         || !Configuration::deleteByName('PAYABBHI_PAYMENT_AUTO_CAPTURE')
         || !parent::uninstall()) {
       return false;
@@ -82,13 +55,17 @@ class Payabbhi extends PaymentModule
     return true;
   }
 
-  private function checkConfig($accessID, $secretKey)
+  private function checkConfig($accessID, $secretKey, $paymentDescription)
   {
     if (!$accessID || empty($accessID)) {
       return false;
     }
 
     if (!$secretKey || empty($secretKey)) {
+      return false;
+    }
+
+    if (!$paymentDescription || empty($paymentDescription)) {
       return false;
     }
 
@@ -103,16 +80,18 @@ class Payabbhi extends PaymentModule
       {
           $accessID           = strval(Tools::getValue('PAYABBHI_ACCESS_ID'));
           $secretKey          = strval(Tools::getValue('PAYABBHI_SECRET_KEY'));
+          $paymentDescription = strval(Tools::getValue('PAYABBHI_PAYMENT_DESCRIPTION'));
           $paymentAutoCapture = strval(Tools::getValue('PAYABBHI_PAYMENT_AUTO_CAPTURE'));
 
-          if (!$this->checkConfig($accessID,$secretKey))
+          if (!$this->checkConfig($accessID, $secretKey, $paymentDescription))
           {
-              $output .= $this->displayError($this->l('Invalid Configuration value'));
+              $output .= $this->displayError($this->l('Invalid Configuration values'));
           }
           else
           {
               Configuration::updateValue('PAYABBHI_ACCESS_ID',  $accessID);
               Configuration::updateValue('PAYABBHI_SECRET_KEY', $secretKey);
+              Configuration::updateValue('PAYABBHI_PAYMENT_DESCRIPTION', $paymentDescription);
               Configuration::updateValue('PAYABBHI_PAYMENT_AUTO_CAPTURE', $paymentAutoCapture);
               $output .= $this->displayConfirmation($this->l('Settings updated'));
           }
@@ -145,6 +124,13 @@ class Payabbhi extends PaymentModule
                   'desc'     => $this->l('Secret Key is available as part of API keys downloaded from the Portal'),
                   'name'     => 'PAYABBHI_SECRET_KEY',
                   'size'     => 20,
+                  'required' => true
+              ),
+              array(
+                  'type'     => 'text',
+                  'label'    => $this->l('Description'),
+                  'desc'     => $this->l('This text will be displayed alongside payabbhi logo on payments page'),
+                  'name'     => 'PAYABBHI_PAYMENT_DESCRIPTION',
                   'required' => true
               ),
               array(
@@ -207,6 +193,7 @@ class Payabbhi extends PaymentModule
       // Load current value
       $helper->fields_value['PAYABBHI_ACCESS_ID'] = Configuration::get('PAYABBHI_ACCESS_ID');
       $helper->fields_value['PAYABBHI_SECRET_KEY'] = Configuration::get('PAYABBHI_SECRET_KEY');
+      $helper->fields_value['PAYABBHI_PAYMENT_DESCRIPTION'] = Configuration::get('PAYABBHI_PAYMENT_DESCRIPTION');
       $helper->fields_value['PAYABBHI_PAYMENT_AUTO_CAPTURE'] = Configuration::get('PAYABBHI_PAYMENT_AUTO_CAPTURE');
       return $helper->generateForm($fields_form);
   }
@@ -215,8 +202,9 @@ class Payabbhi extends PaymentModule
   {
     global $smarty,$cart;
     $smarty->assign(array(
-    'this_path'         => $this->_path,
-    'this_path_ssl'     => Configuration::get('PS_FO_PROTOCOL').$_SERVER['HTTP_HOST'].__PS_BASE_URI__."modules/{$this->name}/"));
+    'this_path'           => $this->_path,
+    'this_path_ssl'       => Configuration::get('PS_FO_PROTOCOL').$_SERVER['HTTP_HOST'].__PS_BASE_URI__."modules/{$this->name}/",
+    'payment_description' => Configuration::get('PAYABBHI_PAYMENT_DESCRIPTION')));
     return $this->display(__FILE__, 'payment.tpl');
   }
 
