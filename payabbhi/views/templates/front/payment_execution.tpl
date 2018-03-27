@@ -20,7 +20,7 @@ mod='payabbhi'} {/capture}
       </h3>
       <p class="cheque-indent">
         <strong class="dark">
-          {l s='You have chosen to pay by payabbhi.Here is a short summary of your order:' mod='payabbhi'}
+          {l s='You have chosen to pay by payabbhi. Here is a short summary of your order:' mod='payabbhi'}
         </strong>
       </p>
       <p>

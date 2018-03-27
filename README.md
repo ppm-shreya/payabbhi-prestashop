@@ -35,6 +35,8 @@ PrestaShop/
   - [Access ID](https://payabbhi.com/docs/account/#api-keys)
   - [Secret Key](https://payabbhi.com/docs/account/#api-keys)
   - [payment_auto_capture](https://payabbhi.com/docs/api/#create-an-order)
+  - Description -  This text will be displayed alongside payabbhi logo on payments page.
+
 
 
 [Payabbhi Checkout](https://payabbhi.com/docs/checkout) is now enabled in PrestaShop.

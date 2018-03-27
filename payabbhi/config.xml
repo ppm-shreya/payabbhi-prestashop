@@ -2,8 +2,8 @@
 <module>
 	<name>payabbhi</name>
 	<displayName><![CDATA[Payabbhi]]></displayName>
-	<version><![CDATA[1.0.0]]></version>
-	<description><![CDATA[Accept payments for your products via Payabbhi.]]></description>
+	<version><![CDATA[1.0.1]]></version>
+	<description><![CDATA[Prestashop module for accepting payments with Payabbhi.]]></description>
 	<author><![CDATA[Payabbhi Team]]></author>
 	<tab><![CDATA[payments_gateways]]></tab>
 	<confirmUninstall><![CDATA[Are you sure you want to uninstall?]]></confirmUninstall>
