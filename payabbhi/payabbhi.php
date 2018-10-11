@@ -2,7 +2,7 @@
 if (!defined('_PS_VERSION_'))
   exit;
 
-require_once('payabbhi-php/init.php');
+require_once('vendor/autoload.php');
 
 class Payabbhi extends PaymentModule
 {
